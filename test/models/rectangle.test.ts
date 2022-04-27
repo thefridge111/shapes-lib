@@ -14,8 +14,6 @@ test('Properly assigns ordered corners', () => {
   expect(rectangle.bottomLeft).toBe(coord2);
   expect(rectangle.topRight).toBe(coord3);
   expect(rectangle.bottomRight).toBe(coord4);
-
-  expect(rectangle.area).toEqual(4);
 });
 
 test('Properly assigns unordered corners', () => {
@@ -32,4 +30,10 @@ test('Properly assigns corners with negative values', () => {
   expect(rectangle.bottomLeft).toBe(negCoord2);
   expect(rectangle.topRight).toBe(coord3);
   expect(rectangle.bottomRight).toBe(coord4);
+});
+
+test('Calculates area correctly', () => {
+  let rectangle = new Rectangle(coord1, coord2, coord3, coord4);
+
+  expect(rectangle.area).toEqual(4);
 });

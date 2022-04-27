@@ -34,7 +34,8 @@ export default class Edge {
     let edgeIntercept = this.getEdgeIntercept(otherEdge);
 
     // no intercept, at best overlapping lines - adjacent shapes possible
-    if (edgeIntercept.x === Infinity || edgeIntercept.y === Infinity) {
+    if ((edgeIntercept.x === Infinity || edgeIntercept.y === Infinity) ||
+        (isNaN(edgeIntercept.x) || isNaN(edgeIntercept.y))) {
       return false;
     }
 
@@ -44,9 +45,9 @@ export default class Edge {
   isAdjacent = function(otherEdge: Edge): boolean {
     let intersectionPoint = this.getEdgeIntercept(otherEdge);
 
-    if (intersectionPoint.x === Infinity && intersectionPoint.y === Infinity && this.isParallel(otherEdge)) {
-      // If either start or end exist on the other line then theyre adjacent
-      return ((otherEdge.getYValueAtPoint(this.start.x) < Infinity) || otherEdge.getYValueAtPoint(this.end.x) < Infinity)
+    if ((intersectionPoint.x === Infinity || intersectionPoint.y === Infinity) && this.isParallel(otherEdge)) {
+      return ((otherEdge.getYValueAtPoint(this.start.x) === this.getYValueAtPoint(this.start.x)) || 
+              (otherEdge.getYValueAtPoint(this.end.x) === this.getYValueAtPoint(this.end.x)));
     }
 
     return false;
@@ -84,8 +85,13 @@ export default class Edge {
     // Divided by 0 -> Infinity --> Both are horizontal lines
     let yEdgeIntercept = ((otherEdge.yIntercept - this.yIntercept) / (this.slope - otherEdge.slope)) + this.yIntercept;
 
+    // Overlapping, horizontal lines
+    if ((this.slope === 0) && isNaN(yEdgeIntercept)) {
+      yEdgeIntercept = Infinity;
+    }
+
     // Vertical line present
-    if (Math.abs(yEdgeIntercept) === NaN) {
+    if (isNaN(Math.abs(yEdgeIntercept))) {
       // Other edge is vertical
       if (this.slope !== Infinity) {
         return { x: otherEdge.start.x, y: this.getYValueAtPoint(otherEdge.start.x) };
@@ -102,7 +108,7 @@ export default class Edge {
     // Both are horizontal lines
     } else if (Math.abs(yEdgeIntercept) === Infinity) {
       // Horizontal lines overlap -> Infinite intersection aka adjacent
-      if (otherEdge.start.x === this.start.x) {
+      if (otherEdge.start.y === this.start.y) {
         return { x: Infinity, y: this.start.y };
       }
       // No intersection, possible adjacency
@@ -115,10 +121,11 @@ export default class Edge {
   isNear = function(otherEdge: Edge): boolean {
     if (((this.start.x >= otherEdge.start.x && this.start.x <= otherEdge.end.x) ||
         (this.end.x >= this.start.x && this.end.x <= otherEdge.end.x)) &&
-        ((this.start.y >= otherEdge.start.y && this.start.y <= otherEdge.end.y) ||
-        (this.end.y >= this.start.y && this.end.y <= otherEdge.end.y))) {
+        ((this.start.y >= otherEdge.end.y && this.end.y <= otherEdge.end.y) ||
+        (this.start.y <= this.start.y && this.end.y >= otherEdge.start.y))) {
       return true;
     }
+
     return false;
   }
 
