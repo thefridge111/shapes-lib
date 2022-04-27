@@ -2,9 +2,11 @@
   "name": "interview-rectangle",
   "version": "1.0.0",
   "description": "Shape library.",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "build": "tsc --build"
   },
   "author": "wperry",
   "license": "ISC",
